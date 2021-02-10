@@ -1,9 +1,13 @@
 import * as functions from "firebase-functions";
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+let svelteServer: any;
+exports.ssr = functions.https.onRequest(
+    async (request: any, response: any) => {
+      if (!svelteServer) {
+        functions.logger.info("Initializing SvelteKit SSR Handler");
+        svelteServer = require("./sveltekit/handler").sveltekitServer;
+        functions.logger.info("SvelteKit SSR Handler initialised!");
+      }
+      return svelteServer(request, response);
+    }
+);
